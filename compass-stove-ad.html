@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Compass Nurse Consulting — 300 Miles Away</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{background:#050810;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+  #app{width:100%;max-width:480px;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;transition:background 0.5s ease}
+  .serif{font-family:'Playfair Display',serif}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeSlideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulseGlow{0%,100%{opacity:0.4}50%{opacity:0.7}}
+  @keyframes gentlePulse{0%,100%{box-shadow:0 0 20px rgba(42,106,79,0.15)}50%{box-shadow:0 0 35px rgba(42,106,79,0.3)}}
+  @keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+  /* Start */
+  #startScreen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:linear-gradient(170deg,#080d13,#0c151e 40%,#0f1a25);position:relative}
+  .start-glow{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(42,106,79,0.12),transparent 70%);animation:pulseGlow 4s ease-in-out infinite}
+  .start-label{font-size:13px;color:#4a7a65;letter-spacing:0.15em;text-transform:uppercase;font-weight:600;margin-bottom:20px;animation:fadeIn 1s ease-out;position:relative}
+  .start-title{font-size:clamp(28px,6vw,42px);color:#e0e8f0;line-height:1.25;font-weight:400;margin-bottom:12px;max-width:380px;animation:fadeSlideUp 1s ease-out 0.2s both;position:relative}
+  .start-title em{font-style:italic;color:#6ab89a}
+  .start-desc{color:#7a8ea0;font-size:15px;max-width:320px;line-height:1.6;margin:16px 0 36px;animation:fadeSlideUp 1s ease-out 0.5s both;position:relative}
+  .start-btn{background:linear-gradient(135deg,#2a6a4f,#1d5940);border:1px solid rgba(106,184,154,0.2);color:#d4f0e4;padding:14px 40px;border-radius:50px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.03em;transition:all 0.25s ease;animation:fadeSlideUp 0.8s ease-out 0.8s both;position:relative}
+  .start-btn:hover{background:linear-gradient(135deg,#348a62,#257a52);transform:scale(1.04)}
+  .start-time{position:absolute;bottom:30px;color:#3a4a58;font-size:11px;letter-spacing:0.05em;animation:fadeIn 1s ease-out 1.2s both}
+
+  /* Scene */
+  #sceneContainer{display:none;flex:1;flex-direction:column;background:linear-gradient(170deg,#0c1117,#0c151e)}
+  .scene-progress{display:flex;gap:4px;padding:20px 24px 8px;justify-content:center}
+  .scene-dot{height:3px;border-radius:2px;flex:1;max-width:48px;background:#1a2530;transition:background 0.4s ease}
+  .scene-dot.active{background:#2a6a4f}
+  .scene-time{text-align:center;padding:12px 0 16px;color:#556677;font-size:12px;font-weight:500;letter-spacing:0.05em;animation:fadeIn 0.5s ease-out}
+  .scene-content{flex:1;padding:0 20px;max-width:420px;margin:0 auto;width:100%;transition:opacity 0.35s ease}
+
+  /* Messages */
+  .msg-row{display:flex;margin-bottom:8px;opacity:0;transform:translateY(12px);transition:all 0.4s ease-out}
+  .msg-row.visible{opacity:1;transform:translateY(0)}
+  .msg-row.sent{justify-content:flex-end;padding-left:40px}
+  .msg-row.recv{justify-content:flex-start;padding-right:40px}
+  .msg-from{font-size:11px;color:#8899aa;margin-bottom:3px;font-weight:600;letter-spacing:0.03em}
+  .msg-bubble{padding:10px 14px;font-size:14.5px;line-height:1.5;color:#e8eef4;max-width:300px}
+  .msg-bubble.recv-b{background:#1c2530;border-radius:16px 16px 16px 4px}
+  .msg-bubble.sent-b{background:linear-gradient(135deg,#2a6a4f,#1d5940);border-radius:16px 16px 4px 16px}
+  .msg-bubble.nurse-b{background:linear-gradient(135deg,#1a3a5c,#1a2f4a);border-radius:16px 16px 16px 4px;box-shadow:0 2px 12px rgba(26,58,92,0.3);border:1px solid rgba(42,106,79,0.25)}
+  .typing{display:none;padding:8px 12px;align-items:center;gap:4px}
+  .typing.visible{display:flex}
+  .typing-dot{width:7px;height:7px;border-radius:50%;background:#667788}
+  .typing-dot:nth-child(1){animation:typingBounce 1.2s ease-in-out 0s infinite}
+  .typing-dot:nth-child(2){animation:typingBounce 1.2s ease-in-out 0.15s infinite}
+  .typing-dot:nth-child(3){animation:typingBounce 1.2s ease-in-out 0.3s infinite}
+
+  /* Calendar */
+  .cal-wrap{background:#141c24;border-radius:16px;padding:16px;border:1px solid #1e2a36;opacity:0;transform:translateY(12px);transition:all 0.5s ease-out}
+  .cal-wrap.visible{opacity:1;transform:translateY(0)}
+  .cal-row{display:flex;align-items:center;gap:12px;padding:10px 0}
+  .cal-row+.cal-row{border-top:1px solid #1a2530}
+  .cal-day{width:40px;text-align:center;font-size:11px;font-weight:700;color:#667788;text-transform:uppercase;letter-spacing:0.05em}
+  .cal-bar{width:4px;height:28px;border-radius:2px;opacity:0.8}
+  .cal-text{font-size:13.5px;color:#c8d4e0}
+
+  /* Prompt/Choices */
+  .prompt{text-align:center;color:#8a9bac;font-size:15px;font-style:italic;margin:24px 0 8px;opacity:0;transform:translateY(12px);transition:all 0.5s ease-out}
+  .prompt.visible{opacity:1;transform:translateY(0)}
+  .choices{display:flex;flex-direction:column;gap:10px;margin-top:20px;opacity:0;transform:translateY(12px);transition:all 0.5s ease-out}
+  .choices.visible{opacity:1;transform:translateY(0)}
+  .choice-btn{background:rgba(26,42,58,0.5);border:1px solid #1e3040;color:#b0c4d8;padding:13px 18px;border-radius:14px;font-size:14.5px;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:left;transition:all 0.25s ease}
+  .choice-btn:hover{background:rgba(42,106,79,0.15);border-color:#2a6a4f;color:#d4f0e4}
+
+  /* Reveal */
+  .reveal-wrap{text-align:center;padding:20px 0;opacity:0;transform:translateY(14px);transition:all 0.8s ease-out}
+  .reveal-wrap.visible{opacity:1;transform:translateY(0)}
+  .reveal-title{font-size:clamp(22px,5vw,30px);color:#e0e8f0;font-weight:400;line-height:1.35;margin:0 0 28px;white-space:pre-line}
+  .reveal-line{font-size:15px;line-height:1.7;margin-bottom:4px;color:transparent;transition:color 0.6s ease}
+  .reveal-line.visible{color:#8a9bac}
+
+  /* CTA */
+  #ctaScreen{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:linear-gradient(170deg,#080d13,#0c151e 40%,#0f1a25)}
+  .cta-orb{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#2a6a4f,#1d5940);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px;animation:gentlePulse 3s ease-in-out infinite}
+  .cta-title{font-size:clamp(24px,5vw,34px);color:#e0e8f0;font-weight:400;line-height:1.3;margin-bottom:8px}
+  .cta-subtitle{color:#6ab89a;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px}
+  .cta-desc{color:#8a9bac;font-size:14.5px;line-height:1.65;max-width:320px;margin:0 auto 32px}
+  .cta-btn{display:inline-block;background:linear-gradient(135deg,#2a6a4f,#1d5940);border:1px solid rgba(106,184,154,0.25);color:#d4f0e4;padding:14px 36px;border-radius:50px;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;letter-spacing:0.03em;transition:all 0.25s ease}
+  .cta-btn:hover{background:linear-gradient(135deg,#348a62,#257a52);transform:scale(1.04)}
+  .cta-phone{margin-top:28px;color:#445566;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px}
+  .replay-btn{margin-top:24px;background:none;border:1px solid #1e2a36;color:#556677;padding:8px 20px;border-radius:50px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+  .replay-btn:hover{border-color:#2a6a4f;color:#6ab89a}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- START -->
+  <div id="startScreen">
+    <div class="start-glow"></div>
+    <div class="start-label">An Interactive Experience</div>
+    <h1 class="start-title serif">300 miles away.<br><em>One phone call behind.</em></h1>
+    <p class="start-desc">A story about caring for a parent when you can't be there — and discovering you don't have to do it alone.</p>
+    <button class="start-btn" id="beginBtn">Begin</button>
+    <div class="start-time">~ 60 seconds</div>
+  </div>
+
+  <!-- SCENES -->
+  <div id="sceneContainer">
+    <div class="scene-progress" id="progressDots"></div>
+    <div class="scene-time" id="sceneTime"></div>
+    <div class="scene-content" id="sceneContent"></div>
+  </div>
+
+  <!-- CTA -->
+  <div id="ctaScreen">
+    <div style="animation:fadeSlideUp 0.8s ease-out;">
+      <div class="cta-orb">🩺</div>
+      <h2 class="cta-title serif">Compass Nurse<br>Consulting</h2>
+      <p class="cta-subtitle">RN-Led Geriatric Care Management</p>
+      <p class="cta-desc">Jessica Kowal, RN, BSN, CDP — over 10 years helping Connecticut families navigate aging and dementia. She can be your eyes, ears, and advocate on the ground.</p>
+      <a class="cta-btn" href="https://www.compassnurseconsulting.com/contact-us" target="_blank" rel="noopener noreferrer">Book a Free Call</a>
+      <div style="color:#556677;font-size:13px;margin-top:8px;">It takes 10 minutes. No pressure. Just clarity.</div>
+      <div class="cta-phone"><span>📞</span> 860-367-8484</div>
+      <button class="replay-btn" id="replayBtn">Replay</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const scenes = [
+    {
+      id:"s1",time:"Tuesday, 9:47 PM",type:"messages",bg:"#0c1117",
+      messages:[
+        {from:"Dad's Neighbor",text:"Hey — just wanted to let you know your dad left the stove on again tonight. I caught it. He seemed confused.",delay:0},
+        {from:"Dad's Neighbor",text:"He's fine now. Just thought you should know.",delay:1800},
+      ],
+      prompt:"You're 3 hours away. What do you do?",
+      choices:["Call Dad — he says he's fine","Google 'signs of dementia'","Lie awake worrying"],
+    },
+    {
+      id:"s2",time:"Thursday, 2:12 PM",type:"messages",bg:"#0c1117",
+      messages:[
+        {from:"Sister",text:"Did you call the doctor yet?",delay:0},
+        {from:"You",text:"I called. They won't talk to me without a HIPAA form.",sent:true,delay:1200},
+        {from:"Sister",text:"Well someone needs to figure this out",delay:2400},
+        {from:"You",text:"I'm doing the best I can from here.",sent:true,delay:3400},
+        {from:"Sister",text:"...",delay:4200},
+      ],
+      prompt:"Sound familiar?",
+      choices:["Too familiar.","This is literally my life right now."],
+    },
+    {
+      id:"s3",time:"2 weeks later",type:"calendar",bg:"#0f1419",
+      events:[
+        {title:"🏥 Dad fell — ER visit",day:"Mon",color:"#e74c3c"},
+        {title:"📞 Call insurance (on hold 47 min)",day:"Tue",color:"#e67e22"},
+        {title:"📋 Discharge papers — ???",day:"Wed",color:"#e67e22"},
+        {title:"😰 Is he safe alone at home?",day:"Thu",color:"#e74c3c"},
+        {title:"🗓 Took off work to drive down",day:"Fri",color:"#9b59b6"},
+      ],
+      prompt:"This is the week you've been dreading.",
+      choices:["I can't keep doing this alone.","There has to be a better way."],
+    },
+    {
+      id:"s4",time:"",type:"reveal",bg:"#0f1821",
+      headline:"What if you had a nurse\nin your corner?",
+      sublines:[
+        "Someone who goes to the house.",
+        "Reviews the meds. Checks the safety risks.",
+        "Talks to the doctors — and then talks to YOU.",
+        "In plain language. With a real plan.",
+      ],
+      choices:["Tell me more"],
+    },
+    {
+      id:"s5",time:"",type:"messages",bg:"#0f1821",
+      messages:[
+        {from:"Jessica, RN",text:"Hi — I visited your dad today. Here's what I found.",delay:0,nurse:true},
+        {from:"Jessica, RN",text:"He's mixing up two of his meds. That's likely causing the confusion. I've called his doctor and we're adjusting.",delay:2000,nurse:true},
+        {from:"Jessica, RN",text:"I also noticed a loose rug by the bathroom — fall risk. Took care of it.",delay:3800,nurse:true},
+        {from:"Jessica, RN",text:"I'll send you a written summary tonight. Call me anytime.",delay:5200,nurse:true},
+      ],
+      choices:["This changes everything."],
+      isFinal:true,
+    },
+  ];
+
+  const totalScenes=scenes.length;
+  let currentScene=0,timers=[];
+  const startScreen=document.getElementById('startScreen'),sceneContainer=document.getElementById('sceneContainer'),ctaScreen=document.getElementById('ctaScreen'),progressDots=document.getElementById('progressDots'),sceneTime=document.getElementById('sceneTime'),sceneContent=document.getElementById('sceneContent');
+
+  for(let i=0;i<totalScenes;i++){const d=document.createElement('div');d.className='scene-dot';d.id='dot-'+i;progressDots.appendChild(d)}
+
+  function addTimer(fn,ms){const t=setTimeout(fn,ms);timers.push(t)}
+  function clearTimers(){timers.forEach(t=>clearTimeout(t));timers=[]}
+  function updateDots(){for(let i=0;i<totalScenes;i++)document.getElementById('dot-'+i).classList.toggle('active',i<=currentScene)}
+
+  function goToScene(idx){
+    clearTimers();currentScene=idx;updateDots();renderScene(scenes[idx]);
+  }
+
+  function renderScene(scene){
+    sceneContent.style.opacity='0';
+    setTimeout(()=>{
+      sceneContent.innerHTML='';
+      sceneTime.textContent=scene.time||'';
+      sceneTime.style.display=scene.time?'block':'none';
+      document.getElementById('app').style.background='linear-gradient(170deg,'+scene.bg+' 0%,#0c151e 100%)';
+      if(scene.type==='messages')renderMessages(scene);
+      else if(scene.type==='calendar')renderCalendar(scene);
+      else if(scene.type==='reveal')renderReveal(scene);
+      sceneContent.style.opacity='1';
+    },100);
+  }
+
+  function renderMessages(scene){
+    const wrap=document.createElement('div');
+    const typingEl=document.createElement('div');
+    typingEl.className='typing';
+    typingEl.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+    scene.messages.forEach((msg,i)=>{
+      const row=document.createElement('div');
+      row.className='msg-row '+(msg.sent?'sent':'recv');
+      const inner=document.createElement('div');
+      if(!msg.sent){const f=document.createElement('div');f.className='msg-from';f.textContent=(msg.nurse?'🩺 ':'')+msg.from;inner.appendChild(f)}
+      const b=document.createElement('div');
+      b.className='msg-bubble '+(msg.sent?'sent-b':(msg.nurse?'nurse-b':'recv-b'));
+      b.textContent=msg.text;inner.appendChild(b);row.appendChild(inner);wrap.appendChild(row);
+
+      const showTyping=i===0?400:msg.delay+400;
+      const showMsg=showTyping+800;
+      addTimer(()=>typingEl.classList.add('visible'),showTyping);
+      addTimer(()=>{typingEl.classList.remove('visible');row.classList.add('visible')},showMsg);
+    });
+
+    wrap.appendChild(typingEl);
+    sceneContent.appendChild(wrap);
+
+    const lastMsg=scene.messages[scene.messages.length-1];
+    const lastTime=lastMsg.delay+400+800;
+
+    if(scene.prompt){
+      const p=document.createElement('div');p.className='prompt serif';p.textContent=scene.prompt;
+      sceneContent.appendChild(p);addTimer(()=>p.classList.add('visible'),lastTime+600);
+    }
+    renderChoices(scene,lastTime+(scene.prompt?1000:800));
+  }
+
+  function renderCalendar(scene){
+    const wrap=document.createElement('div');
+    wrap.className='cal-wrap';
+    scene.events.forEach((ev,i)=>{
+      const row=document.createElement('div');row.className='cal-row';
+      row.innerHTML='<div class="cal-day">'+ev.day+'</div><div class="cal-bar" style="background:'+ev.color+'"></div><div class="cal-text">'+ev.title+'</div>';
+      wrap.appendChild(row);
+    });
+    sceneContent.appendChild(wrap);
+    addTimer(()=>wrap.classList.add('visible'),400);
+
+    if(scene.prompt){
+      const p=document.createElement('div');p.className='prompt serif';p.textContent=scene.prompt;
+      sceneContent.appendChild(p);addTimer(()=>p.classList.add('visible'),1600);
+    }
+    renderChoices(scene,2100);
+  }
+
+  function renderReveal(scene){
+    const wrap=document.createElement('div');wrap.className='reveal-wrap serif';
+    const title=document.createElement('h2');title.className='reveal-title';title.textContent=scene.headline;wrap.appendChild(title);
+    scene.sublines.forEach((line,i)=>{
+      const el=document.createElement('div');el.className='reveal-line';el.textContent=line;wrap.appendChild(el);
+      addTimer(()=>el.classList.add('visible'),900+i*700);
+    });
+    sceneContent.appendChild(wrap);
+    addTimer(()=>wrap.classList.add('visible'),300);
+    renderChoices(scene,900+scene.sublines.length*700+400);
+  }
+
+  function renderChoices(scene,delay){
+    if(!scene.choices||!scene.choices.length)return;
+    const wrap=document.createElement('div');wrap.className='choices';
+    scene.choices.forEach(text=>{
+      const btn=document.createElement('button');btn.className='choice-btn';btn.textContent=text;
+      btn.addEventListener('click',()=>{
+        if(scene.isFinal){sceneContainer.style.display='none';ctaScreen.style.display='flex'}
+        else{sceneContent.style.opacity='0';setTimeout(()=>goToScene(currentScene+1),350)}
+      });
+      wrap.appendChild(btn);
+    });
+    sceneContent.appendChild(wrap);
+    addTimer(()=>wrap.classList.add('visible'),delay);
+  }
+
+  document.getElementById('beginBtn').addEventListener('click',()=>{startScreen.style.display='none';sceneContainer.style.display='flex';goToScene(0)});
+  document.getElementById('replayBtn').addEventListener('click',()=>{ctaScreen.style.display='none';sceneContainer.style.display='none';startScreen.style.display='flex'});
+})();
+</script>
+</body>
+</html>
